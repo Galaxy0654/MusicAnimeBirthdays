@@ -111,6 +111,28 @@ window.BIRTHDAYS = [
   { name: "藤都子", birthday: "09-19", dept: "BanGDream·夢限大みゅーたいぷ" },
   { name: "千石由乃", birthday: "11-04", dept: "BanGDream·夢限大みゅーたいぷ" },
 
+  { name: "汐见萤", birthday: "03-12", dept: "BanGDream·millsage" },
+  { name: "伊泽枣", birthday: "03-30", dept: "BanGDream·millsage" },
+  { name: "滨崎茉幌", birthday: "07-16", dept: "BanGDream·millsage" },
+  { name: "和泉朋花", birthday: "10-24", dept: "BanGDream·millsage" },
+  { name: "琴平凪", birthday: "12-10", dept: "BanGDream·millsage" },
+
+  { name: "结川麻希", birthday: "02-15", dept: "声优-琴平凪" },
+  { name: "伊驹百合绘", birthday: "02-24", dept: "声优-滨崎茉幌" },
+  { name: "千春", birthday: "1995-04-10", dept: "声优-伊泽枣" },
+  { name: "药师寺李有", birthday: "09-11", dept: "声优-汐见萤" },
+  { name: "咲川雏乃", birthday: "2001-01-22", dept: "声优-和泉朋花" },
+  
+  { name: "四宫宁月", birthday: "03-05", dept: "BanGDream·一家Dumb Rock!" },
+  { name: "梅里千樱梨", birthday: "04-02", dept: "BanGDream·一家Dumb Rock!" },
+  { name: "矢仓蓬咲", birthday: "05-06", dept: "BanGDream·一家Dumb Rock!" },
+  { name: "须贺蕾叶", birthday: "07-28", dept: "BanGDream·一家Dumb Rock!" },
+  { name: "马桥心玖", birthday: "10-04", dept: "BanGDream·一家Dumb Rock!" },
+
+  { name: "远野光", birthday: "1996-03-05", dept: "声优-四宫宁月" },
+  { name: "菱川花菜", birthday: "2003-05-19", dept: "声优-梅里千樱梨" },
+  { name: "凉泉樱花", birthday: "2004-03-05", dept: "声优-马桥心玖" },
+  { name: "橘芽衣", birthday: "2008-11-19", dept: "声优-须贺蕾叶" },
 //LoveLive!角色
   { name: "小泉花阳", birthday: "01-17", dept: "LoveLive!·μ's" },
   { name: "园田海未", birthday: "03-15", dept: "LoveLive!·μ's" },
@@ -293,8 +315,27 @@ window.BIRTHDAYS = [
   { name: "理名", birthday: "2007-11-13", dept: "声优-井芹仁菜" },
 
 //pjsk
+
+  { name: "日野森志步", birthday: "01-08", dept: "Project Sekai·Leo/need" },
+  { name: "天马咲希", birthday: "05-09", dept: "Project Sekai·Leo/need" },
+  { name: "星乃一歌", birthday: "08-11", dept: "Project Sekai·Leo/need" },
+  { name: "望月穗波", birthday: "10-27", dept: "Project Sekai·Leo/need" },
+
+  { name: "桃井爱莉", birthday: "03-19", dept: "Project Sekai·MORE MORE JUMP!" },
+  { name: "花里实乃理", birthday: "04-14", dept: "Project Sekai·MORE MORE JUMP!" },
+  { name: "桐谷遥", birthday: "10-05", dept: "Project Sekai·MORE MORE JUMP!" },
+  { name: "日野森雫", birthday: "12-06", dept: "Project Sekai·MORE MORE JUMP!" },
+
+  { name: "小豆泽心羽", birthday: "03-02", dept: "Project Sekai·Vivid BAD SQUAD" },
+  { name: "白石杏", birthday: "07-26", dept: "Project Sekai·Vivid BAD SQUAD" },
+
+  { name: "草薙宁宁", birthday: "07-20", dept: "Project Sekai·Wonderlands×Showtime" },
+  { name: "凤笑梦", birthday: "09-09", dept: "Project Sekai·Wonderlands×Showtime" },
+
   { name: "朝比奈真冬", birthday: "01-27", dept: "Project Sekai·25時、ナイトコードで。" },
   { name: "宵崎奏", birthday: "02-10", dept: "Project Sekai·25時、ナイトコードで。" },
   { name: "东云绘名", birthday: "04-30", dept: "Project Sekai·25時、ナイトコードで。" },
   { name: "晓山瑞希", birthday: "08-27", dept: "Project Sekai·25時、ナイトコードで。" },
+
+  { name: "初音未来", birthday: "08-31", dept: "VOCALOID" },
 ];
