@@ -1,0 +1,239 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>生日提醒（东京时间）</title>
+<style>
+  :root { --bg:#f5f7fb; --card:#fff; --pri:#ff6b81; --text:#2b2d42; --sub:#8d99ae; --line:#eef1f6; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; min-height:100vh; display:flex; align-items:flex-start; justify-content:center;
+    background: var(--bg); padding:32px 24px;
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--text);
+  }
+  .wrap { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; align-items:flex-start;
+          width:100%; max-width:1080px; }
+  .card { flex:1 1 420px; max-width:520px; background:var(--card); border-radius:16px;
+          box-shadow:0 10px 30px rgba(43,45,66,.08); padding:24px 24px 16px; }
+  h1 { font-size:19px; margin:0 0 4px; }
+  .subtitle { color:var(--sub); font-size:13px; margin:0 0 18px; }
+  ul { list-style:none; margin:0; padding:0; }
+
+  /* 今日寿星 */
+  li.person { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); }
+  li.person:last-child { border-bottom:none; }
+  .avatar { width:42px; height:42px; border-radius:50%; object-fit:cover; background:var(--pri);
+            color:#fff; display:flex; align-items:center; justify-content:center;
+            font-weight:600; flex:0 0 auto; }
+  .avatar.sm { width:32px; height:32px; font-size:13px; }
+  .info { flex:1; min-width:0; }
+  .name { font-weight:600; font-size:15px; }
+  .meta { color:var(--sub); font-size:13px; margin-top:2px; }
+  .badge { background:#fff0f3; color:var(--pri); font-size:12px; padding:4px 10px;
+           border-radius:999px; white-space:nowrap; }
+  .empty { color:var(--sub); padding:28px 0; text-align:center; }
+
+  /* 未来 15 天 */
+  li.day { padding:12px 0; border-bottom:1px solid var(--line); }
+  li.day:last-child { border-bottom:none; }
+  .day-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
+  .day-date { font-weight:600; font-size:15px; }
+  .day-week { color:var(--sub); font-size:13px; }
+  .day-offset { margin-left:auto; background:#fff0f3; color:var(--pri);
+                font-size:12px; padding:3px 9px; border-radius:999px; white-space:nowrap; }
+  .person-line { display:flex; align-items:center; gap:10px; padding:5px 0; }
+  .person-line .name { font-size:14px; font-weight:500; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <!-- 今日寿星 -->
+  <div class="card">
+    <h1>🎂 今天的寿星</h1>
+    <p class="subtitle" id="todayLabel"></p>
+    <ul id="list"></ul>
+  </div>
+
+  <!-- 未来 15 天 -->
+  <div class="card">
+    <h1>📅 未来 15 天生日</h1>
+    <p class="subtitle" id="upcomingLabel">明天起 · 东京时间</p>
+    <ul id="upcomingList"></ul>
+  </div>
+</div>
+
+<script src="./birthdays.js"></script>
+
+<script>
+  const BIRTHDAYS = window.BIRTHDAYS || [];
+
+
+// ============ 东九区时间工具 ============
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000; // UTC+9
+const DAY_MS = 24 * 60 * 60 * 1000;
+const UPCOMING_DAYS = 15;                 // 未来天数
+const START_OFFSET = 1;                   // 1 = 从明天开始；想含今天改成 0
+
+const pad = n => String(n).padStart(2, "0");
+const WEEK_CN = "日一二三四五六";
+
+// 返回一个 Date，其 UTC 字段即为东九区当地时间
+function nowInKST() {
+  return new Date(Date.now() + KST_OFFSET_MS);
+}
+
+// ============ 解析生日 ============
+function parseBirthday(raw) {
+  const m = String(raw).match(/(?:(\d{4})[-/.])?(\d{1,2})[-/.](\d{1,2})/);
+  if (!m) return null;
+  return { md: `${pad(m[2])}-${pad(m[3])}`, year: m[1] ? Number(m[1]) : null };
+}
+const isLeapYear = y => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
+
+// ============ 过生日的人 ============
+// d 必须是 nowInKST() 体系下的 Date（用 getUTCxxx 读取）
+function findBirthdaysOn(list, d) {
+  const md = `${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
+  const year = d.getUTCFullYear();
+  // 非闰年时，2-29 出生的人顺延到 2-28 提醒
+  const catchLeap = md === "02-28" && !isLeapYear(year);
+
+  return list
+    .map(p => ({ ...p, _parsed: parseBirthday(p.birthday) }))
+    .filter(p => {
+      if (!p._parsed) return false;
+      if (p._parsed.md === md) return true;
+      if (catchLeap && p._parsed.md === "02-29") return true;
+      return false;
+    })
+    .map(p => ({
+      ...p,
+      age: p._parsed.year ? year - p._parsed.year : null,
+    }));
+}
+
+const byName = (a, b) => a.name.localeCompare(b.name, "zh-Hans-CN");
+
+// 今天
+function findTodaysBirthdays(list) {
+  return findBirthdaysOn(list, nowInKST()).sort(byName);
+}
+
+// 未来 N 天（按日期分组）
+function findUpcomingBirthdays(list, days = UPCOMING_DAYS, startOffset = START_OFFSET) {
+  const base = nowInKST();
+  const groups = [];
+  for (let i = startOffset; i < startOffset + days; i++) {
+    const d = new Date(base.getTime() + i * DAY_MS);
+    const people = findBirthdaysOn(list, d).sort(byName);
+    if (people.length) {
+      groups.push({ date: d, offset: i, people });
+    }
+  }
+  return groups;
+}
+
+// ============ 5. 渲染 ============
+const escapeHtml = s => String(s).replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function avatarHtml(p, small) {
+  const cls = small ? "avatar sm" : "avatar";
+  return p.avatar
+    ? `<img class="${cls}" src="${escapeHtml(p.avatar)}" alt="">`
+    : `<div class="${cls}">${escapeHtml(p.name.slice(0, 1))}</div>`;
+}
+
+function renderToday(people, today = nowInKST()) {
+  const week = WEEK_CN[today.getUTCDay()];
+  document.getElementById("todayLabel").textContent =
+    `${today.getUTCFullYear()}年${today.getUTCMonth() + 1}月${today.getUTCDate()}日 ` +
+    `星期${week}（东京时间） · 共 ${people.length} 位`;
+
+  const ul = document.getElementById("list");
+  if (!people.length) {
+    ul.innerHTML = `<li class="empty">今天没有寿星 🍰</li>`;
+    return;
+  }
+  ul.innerHTML = people.map(p => {
+    const meta = [p.dept, p.age != null ? `${p.age} 岁` : null].filter(Boolean).join(" · ");
+    return `<li class="person">
+      ${avatarHtml(p, false)}
+      <div class="info">
+        <div class="name">${escapeHtml(p.name)}</div>
+        ${meta ? `<div class="meta">${escapeHtml(meta)}</div>` : ""}
+      </div>
+      <span class="badge">生日快乐 🎉</span>
+    </li>`;
+  }).join("");
+}
+
+function offsetText(i) {
+  if (i === 0) return "今天";
+  if (i === 1) return "明天";
+  if (i === 2) return "后天";
+  return `${i} 天后`;
+}
+
+function renderUpcoming(groups) {
+  const total = groups.reduce((n, g) => n + g.people.length, 0);
+  document.getElementById("upcomingLabel").textContent =
+    `明天起（东京时间）  ${total} 人即将迎来生日`;
+
+  const ul = document.getElementById("upcomingList");
+  if (!groups.length) {
+    ul.innerHTML = `<li class="empty">未来 ${UPCOMING_DAYS} 天没有寿星 🍃</li>`;
+    return;
+  }
+
+  ul.innerHTML = groups.map(g => {
+    const d = g.date;
+    const week = WEEK_CN[d.getUTCDay()];
+    const people = g.people.map(p => {
+      const meta = [p.dept, p.age != null ? `满 ${p.age} 岁` : null].filter(Boolean).join(" · ");
+      return `<div class="person-line">
+        ${avatarHtml(p, true)}
+        <div class="info">
+          <div class="name">${escapeHtml(p.name)}</div>
+          ${meta ? `<div class="meta">${escapeHtml(meta)}</div>` : ""}
+        </div>
+      </div>`;
+    }).join("");
+
+    return `<li class="day">
+      <div class="day-head">
+        <span class="day-date">${d.getUTCMonth() + 1}月${d.getUTCDate()}日</span>
+        <span class="day-week">星期${week}</span>
+        <span class="day-offset">${offsetText(g.offset)}</span>
+      </div>
+      ${people}
+    </li>`;
+  }).join("");
+}
+
+// ============ 6. 统一刷新 ============
+function refreshAll() {
+  renderToday(findTodaysBirthdays(BIRTHDAYS));
+  renderUpcoming(findUpcomingBirthdays(BIRTHDAYS));
+}
+
+refreshAll();
+
+// 跨东九区零点自动刷新
+(function scheduleMidnightRefreshKST() {
+  const now = Date.now();
+  const kstNow = now + KST_OFFSET_MS;
+  const kstMidnight = Math.floor(kstNow / DAY_MS) * DAY_MS;
+  const nextKstMidnightReal = kstMidnight + DAY_MS - KST_OFFSET_MS + 5000; // 5 秒缓冲
+  const delay = Math.max(nextKstMidnightReal - now, 1000);
+
+  setTimeout(() => {
+    refreshAll();
+    scheduleMidnightRefreshKST();
+  }, delay);
+})();
+</script>
+</body>
+</html>
