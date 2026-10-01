@@ -94,16 +94,19 @@ window.BIRTHDAYS = [
   { name: "林鼓子", birthday: "2000-05-15", dept: "声优-椎名立希、优木雪菜" },
 
   { name: "若叶睦", birthday: "01-14", dept: "BanGDream·Ave Mujica" },
+  { name: "丰川祥子", birthday: "02-14", dept: "BanGDream·Ave Mujica" },
   { name: "八幡海铃", birthday: "04-07", dept: "BanGDream·Ave Mujica" },
   { name: "祐天寺喵梦", birthday: "06-01", dept: "BanGDream·Ave Mujica" },
   { name: "三角初华", birthday: "06-26", dept: "BanGDream·Ave Mujica" },
-  { name: "丰川祥子", birthday: "02-14", dept: "BanGDream·Ave Mujica" },
-
+  
   { name: "冈田梦以", birthday: "1996-05-19", dept: "声优-八幡海铃" },
   { name: "佐佐木李子", birthday: "1997-11-10", dept: "声优-三角初华" },
   { name: "米泽茜", birthday: "1998-12-31", dept: "声优-祐天寺喵梦" },
   { name: "高尾奏音", birthday: "2002-09-10", dept: "声优-丰川祥子" },
   { name: "渡濑结月", birthday: "2003-02-18", dept: "声优-若叶睦" },
+
+  { name: "纯田真奈", birthday: "10-02", dept: "BanGDream·Sumimi" },
+  { name: "反田叶月", birthday: "2001-02-28", dept: "声优-纯田真奈" },
 
   { name: "峰月律", birthday: "02-07", dept: "BanGDream·夢限大みゅーたいぷ" },
   { name: "宫永野乃花", birthday: "04-17", dept: "BanGDream·夢限大みゅーたいぷ" },
