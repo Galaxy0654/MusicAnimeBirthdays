@@ -8,83 +8,182 @@
   :root { --bg:#f5f7fb; --card:#fff; --pri:#ff6b81; --text:#2b2d42; --sub:#8d99ae; --line:#eef1f6; }
   * { box-sizing: border-box; }
   body {
-    margin:0; min-height:100vh; display:flex; align-items:flex-start; justify-content:center;
-    background: var(--bg); padding:32px 24px;
+    margin:0; min-height:100vh; background:var(--bg); padding:32px 16px;
     font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
     color: var(--text);
   }
-  .wrap { display:flex; gap:20px; flex-wrap:wrap; justify-content:center; align-items:flex-start;
-          width:100%; max-width:1080px; }
-  .card { flex:1 1 420px; max-width:520px; background:var(--card); border-radius:16px;
-          box-shadow:0 10px 30px rgba(43,45,66,.08); padding:24px 24px 16px; }
+  .wrap { width:100%; max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:20px; }
+  .card { background:var(--card); border-radius:16px; box-shadow:0 10px 30px rgba(43,45,66,.08); padding:24px; }
   h1 { font-size:19px; margin:0 0 4px; }
-  .subtitle { color:var(--sub); font-size:13px; margin:0 0 18px; }
+  .subtitle { color:var(--sub); font-size:13px; margin:0 0 16px; }
   ul { list-style:none; margin:0; padding:0; }
 
-  /* 今日寿星 */
   li.person { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); }
   li.person:last-child { border-bottom:none; }
-  .avatar { width:42px; height:42px; border-radius:50%; object-fit:cover; background:var(--pri);
+  .avatar { width:80px; height:80px; font-size:28px; border-radius:50%; object-fit:cover; background:var(--pri);
             color:#fff; display:flex; align-items:center; justify-content:center;
             font-weight:600; flex:0 0 auto; }
-  .avatar.sm { width:32px; height:32px; font-size:13px; }
+  .avatar.sm { width:72px; height:72px; font-size:24px; }
   .info { flex:1; min-width:0; }
-  .name { font-weight:600; font-size:15px; }
-  .meta { color:var(--sub); font-size:13px; margin-top:2px; }
-  .badge { background:#fff0f3; color:var(--pri); font-size:12px; padding:4px 10px;
+  .name { font-weight:600; font-size:24px; }
+  .meta { color:var(--sub); font-size:18px; margin-top:2px;
+          display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; }
+  .badge { background:#fff0f3; color:var(--pri); font-size:15px; padding:4px 10px;
            border-radius:999px; white-space:nowrap; }
   .empty { color:var(--sub); padding:28px 0; text-align:center; }
 
-  /* 未来 15 天 */
   li.day { padding:12px 0; border-bottom:1px solid var(--line); }
   li.day:last-child { border-bottom:none; }
-  .day-head { display:flex; align-items:center; gap:10px; margin-bottom:8px; }
-  .day-date { font-weight:600; font-size:15px; }
-  .day-week { color:var(--sub); font-size:13px; }
+  .day-head { display:flex; align-items:center; gap:10px; margin-bottom:6px; }
+  .day-date { font-weight:600; font-size:18px; }
+  .day-week { color:var(--sub); font-size:15px; }
   .day-offset { margin-left:auto; background:#fff0f3; color:var(--pri);
-                font-size:12px; padding:3px 9px; border-radius:999px; white-space:nowrap; }
+                font-size:15px; padding:3px 9px; border-radius:999px; white-space:nowrap; }
   .person-line { display:flex; align-items:center; gap:10px; padding:5px 0; }
-  .person-line .name { font-size:14px; font-weight:500; }
+  .person-line .name { font-size:20px; font-weight:500; }
+
+  .cal-head { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+  .cal-title { font-weight:600; font-size:16px; min-width:104px; text-align:center; }
+  .cal-btn { border:none; background:#f0f2f8; color:var(--text); border-radius:8px;
+             width:32px; height:32px; font-size:18px; line-height:1; cursor:pointer; }
+  .cal-btn:hover { background:#e4e8f2; }
+  .cal-btn-text { width:auto; padding:0 12px; font-size:13px; height:32px; margin-left:auto; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+  .cal-weekday { text-align:center; font-size:12px; color:var(--sub); padding:2px 0 4px; }
+  .cal-cell { min-height:58px; border-radius:10px; background:#fafbfe;
+              display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+              gap:5px; padding:7px 4px; font-size:13px; }
+  .cal-cell.empty { background:transparent; }
+  .cal-cell.has-bday { background:#f8f9fc; cursor:pointer; }
+  .cal-cell.has-bday:hover { background:#ffe3ea; }
+  .cal-cell.today { box-shadow: inset 0 0 0 2px var(--pri); }
+  .cal-cell.selected { box-shadow: inset 0 0 0 2px var(--text); }
+  .cal-day-num { font-weight:600; }
+  .cal-cell.has-bday .cal-day-num { color:var(--pri); }
+  .cal-dots { display:flex; gap:3px; flex-wrap:wrap; justify-content:center; align-items:center; }
+  .dot { width:6px; height:6px; border-radius:50%; background:var(--pri); }
+  .cal-more { font-size:11px; color:var(--pri); }
+
+  .cal-legend { display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:14px;
+                padding-top:12px; border-top:1px solid var(--line); }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--sub); }
+  .legend-dot { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+
+  .cal-detail { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+  .cal-detail .hint { color:var(--sub); font-size:13px; }
+  .cal-detail-title { font-size:14px; font-weight:600; margin-bottom:6px; }
+  .cal-person { display:flex; align-items:center; gap:10px; padding:6px 0; }
+
+  /* 部门 / 子部门 标签 */
+  .dept-tag { display:inline-flex; align-items:center; gap:5px; color:var(--sub); }
+  .age-tag { color: var(--sub); }
+  .dept-dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
+  .dept-sep { color:#c3c9d4; }
+
+  @media (max-width:520px) {
+    .card { padding:18px; }
+    .cal-cell { min-height:50px; padding:6px 2px; font-size:12px; }
+    .cal-title { min-width:88px; font-size:15px; }
+  }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <!-- 今日寿星 -->
+
   <div class="card">
     <h1>🎂 今天的寿星</h1>
     <p class="subtitle" id="todayLabel"></p>
     <ul id="list"></ul>
   </div>
 
-  <!-- 未来 15 天 -->
   <div class="card">
     <h1>📅 未来 15 天生日</h1>
     <p class="subtitle" id="upcomingLabel">明天起 · 东京时间</p>
     <ul id="upcomingList"></ul>
   </div>
+
+  <div class="card">
+    <h1>🗓️ 生日日历</h1>
+    <p class="subtitle">东京时间 · 点击粉色日期查看当天寿星 · 圆点颜色代表企划</p>
+    <div class="cal-head">
+      <button id="calPrev" class="cal-btn" aria-label="上个月">‹</button>
+      <span class="cal-title" id="calTitle"></span>
+      <button id="calNext" class="cal-btn" aria-label="下个月">›</button>
+      <button id="calToday" class="cal-btn cal-btn-text">回到本月</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-legend" id="calLegend"></div>
+    <div class="cal-detail" id="calDetail"></div>
+  </div>
+
 </div>
 
 <script src="./birthdays.js"></script>
-
 <script>
   const BIRTHDAYS = window.BIRTHDAYS || [];
 
+// ============ 2. 部门颜色 ============
+// 是否让“子部门”独立上色；false = 同主部门同色，子部门只做文字展示
+const COLOR_BY_SUBDEPT = false;
 
-// ============ 东九区时间工具 ============
-const KST_OFFSET_MS = 9 * 60 * 60 * 1000; // UTC+9
+// 常用固定颜色（COLOR_BY_SUBDEPT=true 时可用 "A/BA" 这样的键）
+const DEPT_COLORS = {
+  "BanGDream!": "#e5004f",
+  "LoveLive!": "#FF7F27",
+  "少女歌剧": "#6FC960",
+  "轻音少女": "#069E1B",
+  "Girls Band Cry": "#6B0000",
+  "Project Sekai": "#0696DE",
+
+  "声优": "#D6B82E",
+};
+const DEFAULT_DEPT_COLOR = "#b2bec3";
+
+// 取一个人用于上色的键
+function colorKeyOf(p) {
+  if (!p || !p.dept) return "";
+  if (COLOR_BY_SUBDEPT && p.subDept) return `${p.dept}/${p.subDept}`;
+  return p.dept;
+}
+
+// 按色键取颜色：映射表优先，否则按字符串哈希生成稳定 HSL
+function deptColor(key) {
+  if (!key) return DEFAULT_DEPT_COLOR;
+  if (DEPT_COLORS[key]) return DEPT_COLORS[key];
+  let h = 0;
+  for (let i = 0; i < key.length; i++) {
+    h = (h * 31 + key.charCodeAt(i)) % 360;
+  }
+  return `hsl(${h}, 70%, 58%)`;
+}
+
+// 色键转人类可读文本
+function labelOfKey(key) {
+  if (!key) return "";
+  return key.replace("/", " / ");
+}
+
+// 一个人的部门展示文本：主部门 / 子部门
+function deptLabel(p) {
+  if (!p.dept) return "";
+  if (p.subDept) return `${p.dept} / ${p.subDept}`;
+  return p.dept;
+}
+
+// ============ 3. 东京时间时间工具 ============
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
 const DAY_MS = 24 * 60 * 60 * 1000;
-const UPCOMING_DAYS = 15;                 // 未来天数
-const START_OFFSET = 1;                   // 1 = 从明天开始；想含今天改成 0
+const UPCOMING_DAYS = 15;
+const START_OFFSET = 1;
 
 const pad = n => String(n).padStart(2, "0");
 const WEEK_CN = "日一二三四五六";
 
-// 返回一个 Date，其 UTC 字段即为东九区当地时间
 function nowInKST() {
   return new Date(Date.now() + KST_OFFSET_MS);
 }
 
-// ============ 解析生日 ============
+// ============ 4. 解析生日 ============
 function parseBirthday(raw) {
   const m = String(raw).match(/(?:(\d{4})[-/.])?(\d{1,2})[-/.](\d{1,2})/);
   if (!m) return null;
@@ -92,12 +191,10 @@ function parseBirthday(raw) {
 }
 const isLeapYear = y => (y % 4 === 0 && y % 100 !== 0) || y % 400 === 0;
 
-// ============ 过生日的人 ============
-// d 必须是 nowInKST() 体系下的 Date（用 getUTCxxx 读取）
+// ============ 5. 核心：某一天过生日的人 ============
 function findBirthdaysOn(list, d) {
   const md = `${pad(d.getUTCMonth() + 1)}-${pad(d.getUTCDate())}`;
   const year = d.getUTCFullYear();
-  // 非闰年时，2-29 出生的人顺延到 2-28 提醒
   const catchLeap = md === "02-28" && !isLeapYear(year);
 
   return list
@@ -108,34 +205,27 @@ function findBirthdaysOn(list, d) {
       if (catchLeap && p._parsed.md === "02-29") return true;
       return false;
     })
-    .map(p => ({
-      ...p,
-      age: p._parsed.year ? year - p._parsed.year : null,
-    }));
+    .map(p => ({ ...p, age: p._parsed.year ? year - p._parsed.year : null }));
 }
 
 const byName = (a, b) => a.name.localeCompare(b.name, "zh-Hans-CN");
 
-// 今天
 function findTodaysBirthdays(list) {
   return findBirthdaysOn(list, nowInKST()).sort(byName);
 }
 
-// 未来 N 天（按日期分组）
 function findUpcomingBirthdays(list, days = UPCOMING_DAYS, startOffset = START_OFFSET) {
   const base = nowInKST();
   const groups = [];
   for (let i = startOffset; i < startOffset + days; i++) {
     const d = new Date(base.getTime() + i * DAY_MS);
     const people = findBirthdaysOn(list, d).sort(byName);
-    if (people.length) {
-      groups.push({ date: d, offset: i, people });
-    }
+    if (people.length) groups.push({ date: d, offset: i, people });
   }
   return groups;
 }
 
-// ============ 5. 渲染 ============
+// ============ 6. 渲染工具 ============
 const escapeHtml = s => String(s).replace(/[&<>"']/g, c =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 
@@ -143,9 +233,128 @@ function avatarHtml(p, small) {
   const cls = small ? "avatar sm" : "avatar";
   return p.avatar
     ? `<img class="${cls}" src="${escapeHtml(p.avatar)}" alt="">`
-    : `<div class="${cls}">${escapeHtml(p.name.slice(0, 1))}</div>`;
+    : `<div class="${cls}" style="background:${deptColor(colorKeyOf(p))}">${escapeHtml(p.name.slice(0, 1))}</div>`;
 }
 
+// 部门标签：主部门 / 子部门（带颜色点）
+function deptTag(p) {
+  const label = deptLabel(p);
+  if (!label) return "";
+  return `<span class="dept-tag">
+    <span class="dept-dot" style="background:${deptColor(colorKeyOf(p))}"></span>
+    ${escapeHtml(p.dept)}${p.subDept ? `<span class="dept-sep">/</span>${escapeHtml(p.subDept)}` : ""}
+  </span>`;
+}
+
+function personMeta(p, agePrefix) {
+  return p.age != null
+    ? `<span class="age-tag">${agePrefix}${p.age} 岁</span>`
+    : "";
+}
+
+// 头像
+// 头像约定：./avatars/{id}.webp / .jpg / .png，找不到就用姓名
+const AVATAR_CONFIG = {
+  dir: "./avatars/",
+  exts: ["webp", "jpg", "png"],
+  keys: ["name", "subDept", "dept"], // 按顺序尝试，数据库里有什么就用什么
+};
+
+function avatarCandidates(p) {
+  if (p.avatar) return [p.avatar];          // 显式指定优先
+  const urls = [];
+  for (const key of AVATAR_CONFIG.keys) {
+    const v = p[key];
+    if (!v) continue;
+    for (const ext of AVATAR_CONFIG.exts) {
+      urls.push(`${AVATAR_CONFIG.dir}${encodeURIComponent(v)}.${ext}`);
+    }
+  }
+  return urls;
+}
+
+// 存每个占位 div 对应的候选列表
+const avatarJobs = new Map();
+let avatarJobSeq = 0;
+// 已确认失败的 URL，跨刷新去重，避免反复发 404
+const failedAvatarUrls = new Set();
+
+function avatarHtml(p, small) {
+  const cls = small ? "avatar sm" : "avatar";
+  const bg = deptColor(colorKeyOf(p));
+  const initial = (p.name || "?").trim().slice(0, 1) || "?";
+  const cands = avatarCandidates(p);
+
+  // 没候选：直接首字占位（正常走不到，name 兜底一定非空）
+  if (!cands.length) {
+    return `<div class="${cls}" style="background:${bg}">${escapeHtml(initial)}</div>`;
+  }
+
+  const key = `av${++avatarJobSeq}`;
+  avatarJobs.set(key, cands);
+
+  // 先输出占位 div；异步探测成功后才换成 img
+  return `<div class="${cls} avatar-placeholder"
+    data-av-key="${key}"
+    data-bg="${escapeHtml(bg)}"
+    data-initial="${escapeHtml(initial)}"
+    data-name="${escapeHtml(p.name || "")}"
+    style="background:${bg}">${escapeHtml(initial)}</div>`;
+}
+
+function hydrateAvatars(root = document) {
+  root.querySelectorAll(".avatar-placeholder[data-av-key]").forEach(el => {
+    if (el.dataset.hydrating || el.dataset.avFailed) return;
+    el.dataset.hydrating = "1";
+
+    const cands = avatarJobs.get(el.dataset.avKey) || [];
+    let i = 0;
+
+    (function tryNext() {
+      // 跳过已确认失败的 URL
+      while (i < cands.length && failedAvatarUrls.has(cands[i])) i++;
+
+      if (i >= cands.length) {
+        // 全部失败：占位 div 保持原样（首字 + 部门色），标记失败防重试
+        el.dataset.avFailed = "1";
+        delete el.dataset.hydrating;
+        return;
+      }
+
+      const url = cands[i];
+      const probe = new Image();
+
+      probe.onload = () => {
+        const real = document.createElement("img");
+        real.className = el.className
+          .replace(/\bavatar-placeholder\b/g, "")
+          .replace(/\s+/g, " ")
+          .trim();
+        real.src = url;
+        real.alt = el.dataset.name || "";
+        real.style.background = el.dataset.bg || "";
+        real.decoding = "async";
+        real.referrerPolicy = "no-referrer";
+        el.replaceWith(real);
+      };
+
+      probe.onerror = () => {
+        failedAvatarUrls.add(url);
+        i++;
+        tryNext();
+      };
+
+      probe.src = url;
+    })();
+  });
+}
+
+// 拼接 meta：部门标签 + 年龄
+function metaLine(p, agePrefix) {
+  return [deptTag(p), personMeta(p, agePrefix)].filter(Boolean).join(`<span class="dept-sep"> · </span>`);
+}
+
+// ============ 7. 今日寿星 ============
 function renderToday(people, today = nowInKST()) {
   const week = WEEK_CN[today.getUTCDay()];
   document.getElementById("todayLabel").textContent =
@@ -158,18 +367,19 @@ function renderToday(people, today = nowInKST()) {
     return;
   }
   ul.innerHTML = people.map(p => {
-    const meta = [p.dept, p.age != null ? `${p.age} 岁` : null].filter(Boolean).join(" · ");
+    const meta = metaLine(p, "");
     return `<li class="person">
       ${avatarHtml(p, false)}
       <div class="info">
         <div class="name">${escapeHtml(p.name)}</div>
-        ${meta ? `<div class="meta">${escapeHtml(meta)}</div>` : ""}
+        ${meta ? `<div class="meta">${meta}</div>` : ""}
       </div>
       <span class="badge">生日快乐 🎉</span>
     </li>`;
   }).join("");
 }
 
+// ============ 8. 未来 15 天 ============
 function offsetText(i) {
   if (i === 0) return "今天";
   if (i === 1) return "明天";
@@ -180,24 +390,23 @@ function offsetText(i) {
 function renderUpcoming(groups) {
   const total = groups.reduce((n, g) => n + g.people.length, 0);
   document.getElementById("upcomingLabel").textContent =
-    `明天起（东京时间）  ${total} 人即将迎来生日`;
+    `明天起 · 东京时间 · 共 ${total} 位寿星`;
 
   const ul = document.getElementById("upcomingList");
   if (!groups.length) {
     ul.innerHTML = `<li class="empty">未来 ${UPCOMING_DAYS} 天没有寿星 🍃</li>`;
     return;
   }
-
   ul.innerHTML = groups.map(g => {
     const d = g.date;
     const week = WEEK_CN[d.getUTCDay()];
     const people = g.people.map(p => {
-      const meta = [p.dept, p.age != null ? `满 ${p.age} 岁` : null].filter(Boolean).join(" · ");
+      const meta = metaLine(p, "满 ");
       return `<div class="person-line">
         ${avatarHtml(p, true)}
         <div class="info">
           <div class="name">${escapeHtml(p.name)}</div>
-          ${meta ? `<div class="meta">${escapeHtml(meta)}</div>` : ""}
+          ${meta ? `<div class="meta">${meta}</div>` : ""}
         </div>
       </div>`;
     }).join("");
@@ -213,20 +422,178 @@ function renderUpcoming(groups) {
   }).join("");
 }
 
-// ============ 6. 统一刷新 ============
+// ============ 9. 生日日历 ============
+let calYear, calMonth, selectedDay = null, userNavigated = false;
+
+function syncCalToNow() {
+  const t = nowInKST();
+  calYear = t.getUTCFullYear();
+  calMonth = t.getUTCMonth() + 1;
+  selectedDay = null;
+}
+
+function monthBirthdayMap() {
+  const map = new Map();
+  const daysInMonth = new Date(Date.UTC(calYear, calMonth, 0)).getUTCDate();
+  for (let day = 1; day <= daysInMonth; day++) {
+    const d = new Date(Date.UTC(calYear, calMonth - 1, day));
+    const people = findBirthdaysOn(BIRTHDAYS, d).sort(byName);
+    if (people.length) map.set(day, people);
+  }
+  return map;
+}
+
+function renderCalendar() {
+  document.getElementById("calTitle").textContent = `${calYear}年${calMonth}月`;
+
+  const firstDow = new Date(Date.UTC(calYear, calMonth - 1, 1)).getUTCDay();
+  const daysInMonth = new Date(Date.UTC(calYear, calMonth, 0)).getUTCDate();
+  const bdayMap = monthBirthdayMap();
+
+  const t = nowInKST();
+  const isCurrentMonth = calYear === t.getUTCFullYear() && calMonth === t.getUTCMonth() + 1;
+  const todayDay = t.getUTCDate();
+
+  const cells = [];
+  WEEK_CN.split("").forEach(w => cells.push(`<div class="cal-weekday">${w}</div>`));
+  for (let i = 0; i < firstDow; i++) cells.push(`<div class="cal-cell empty"></div>`);
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const people = bdayMap.get(day) || [];
+    const cls = ["cal-cell"];
+    if (people.length) cls.push("has-bday");
+    if (isCurrentMonth && day === todayDay) cls.push("today");
+    if (selectedDay === day) cls.push("selected");
+
+    const dots = people.length
+      ? `<div class="cal-dots">` +
+        people.slice(0, 5).map(p => {
+          const label = [p.name, deptLabel(p)].filter(Boolean).join(" · ");
+          return `<span class="dot" style="background:${deptColor(colorKeyOf(p))}" title="${escapeHtml(label)}"></span>`;
+        }).join("") +
+        (people.length > 5 ? `<span class="cal-more">+${people.length - 5}</span>` : "") +
+        `</div>`
+      : "";
+    const dataDay = people.length ? ` data-day="${day}"` : "";
+
+    cells.push(`<div class="${cls.join(" ")}"${dataDay}>
+      <span class="cal-day-num">${day}</span>${dots}
+    </div>`);
+  }
+
+  const tail = (7 - (firstDow + daysInMonth) % 7) % 7;
+  for (let i = 0; i < tail; i++) cells.push(`<div class="cal-cell empty"></div>`);
+
+  document.getElementById("calGrid").innerHTML = cells.join("");
+  renderCalLegend(bdayMap);
+}
+
+// 图例：收集本月出现过的“色键”，同色只显示一次
+function renderCalLegend(bdayMap) {
+  const el = document.getElementById("calLegend");
+  const keys = new Set();
+  bdayMap.forEach(people => people.forEach(p => {
+    const k = colorKeyOf(p);
+    if (k) keys.add(k);
+  }));
+
+  if (!keys.size) { el.innerHTML = ""; return; }
+
+  el.innerHTML = [...keys]
+    .sort((a, b) => a.localeCompare(b, "zh-Hans-CN"))
+    .map(k => `<span class="legend-item">
+      <span class="legend-dot" style="background:${deptColor(k)}"></span>${escapeHtml(labelOfKey(k))}
+    </span>`)
+    .join("");
+}
+
+function renderCalDetail() {
+  const el = document.getElementById("calDetail");
+  const t = nowInKST();
+  const isCurrentMonth = calYear === t.getUTCFullYear() && calMonth === t.getUTCMonth() + 1;
+
+  let day = selectedDay;
+  let prefix = "";
+
+  if (day == null) {
+    if (!isCurrentMonth) {
+      el.innerHTML = `<span class="hint">点击带粉色标记的日期，查看当天寿星</span>`;
+      return;
+    }
+    day = t.getUTCDate();
+    prefix = "今天 · ";
+  }
+
+  const d = new Date(Date.UTC(calYear, calMonth - 1, day));
+  const people = findBirthdaysOn(BIRTHDAYS, d).sort(byName);
+
+  if (!people.length) {
+    el.innerHTML = `<span class="hint">${calMonth}月${day}日没有寿星</span>`;
+    return;
+  }
+
+  el.innerHTML =
+    `<div class="cal-detail-title">${prefix}${calMonth}月${day}日 · 共 ${people.length} 位</div>` +
+    people.map(p => {
+      const meta = metaLine(p, "满 ");
+      return `<div class="cal-person">
+        ${avatarHtml(p, true)}
+        <div class="info">
+          <div class="name">${escapeHtml(p.name)}</div>
+          ${meta ? `<div class="meta">${meta}</div>` : ""}
+        </div>
+      </div>`;
+    }).join("");
+  hydrateAvatars(document.getElementById("calDetail"));
+}
+
+function shiftMonth(delta) {
+  userNavigated = true;
+  let m = calMonth + delta, y = calYear;
+  if (m < 1) { m = 12; y--; }
+  if (m > 12) { m = 1; y++; }
+  calYear = y;
+  calMonth = m;
+  selectedDay = null;
+  renderCalendar();
+  renderCalDetail();
+}
+
+// ============ 10. 统一刷新 ============
 function refreshAll() {
+  avatarJobs.clear();          // 整段重渲染前清掉旧 key
+  if (!userNavigated) syncCalToNow();
   renderToday(findTodaysBirthdays(BIRTHDAYS));
   renderUpcoming(findUpcomingBirthdays(BIRTHDAYS));
+  renderCalendar();
+  renderCalDetail();           // 内部已调用 hydrateAvatars
+  hydrateAvatars();            // 兜底给 #list / #upcomingList 挂载
 }
+
+// ============ 11. 事件绑定与启动 ============
+document.getElementById("calPrev").addEventListener("click", () => shiftMonth(-1));
+document.getElementById("calNext").addEventListener("click", () => shiftMonth(1));
+document.getElementById("calToday").addEventListener("click", () => {
+  userNavigated = false;
+  syncCalToNow();
+  renderCalendar();
+  renderCalDetail();
+});
+document.getElementById("calGrid").addEventListener("click", e => {
+  const cell = e.target.closest(".has-bday");
+  if (!cell || !cell.dataset.day) return;
+  selectedDay = Number(cell.dataset.day);
+  renderCalendar();
+  renderCalDetail();
+});
 
 refreshAll();
 
-// 跨东九区零点自动刷新
 (function scheduleMidnightRefreshKST() {
   const now = Date.now();
   const kstNow = now + KST_OFFSET_MS;
   const kstMidnight = Math.floor(kstNow / DAY_MS) * DAY_MS;
-  const nextKstMidnightReal = kstMidnight + DAY_MS - KST_OFFSET_MS + 5000; // 5 秒缓冲
+  const nextKstMidnightReal = kstMidnight + DAY_MS - KST_OFFSET_MS + 5000;
   const delay = Math.max(nextKstMidnightReal - now, 1000);
 
   setTimeout(() => {
