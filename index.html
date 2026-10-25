@@ -28,6 +28,7 @@
   .name { font-weight:600; font-size:24px; }
   .meta { color:var(--sub); font-size:18px; margin-top:2px;
           display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; }
+  .name-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .badge { background:#fff0f3; color:var(--pri); font-size:15px; padding:4px 10px;
            border-radius:999px; white-space:nowrap; }
   .empty { color:var(--sub); padding:28px 0; text-align:center; }
@@ -54,7 +55,7 @@
               display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
               gap:5px; padding:7px 4px; font-size:13px; }
   .cal-cell.empty { background:transparent; }
-  .cal-cell.has-bday { background:#f8f9fc; cursor:pointer; }
+  .cal-cell.has-bday { background:#fff3fd; cursor:pointer; }
   .cal-cell.has-bday:hover { background:#ffe3ea; }
   .cal-cell.today { box-shadow: inset 0 0 0 2px var(--pri); }
   .cal-cell.selected { box-shadow: inset 0 0 0 2px var(--text); }
@@ -97,14 +98,14 @@
   </div>
 
   <div class="card">
-    <h1>📅 未来 15 天生日</h1>
+    <h1>⏱️ 未来 15 天生日</h1>
     <p class="subtitle" id="upcomingLabel">明天起 · 东京时间</p>
     <ul id="upcomingList"></ul>
   </div>
 
   <div class="card">
     <h1>🗓️ 生日日历</h1>
-    <p class="subtitle">东京时间 · 点击粉色日期查看当天寿星 · 圆点颜色代表企划</p>
+    <p class="subtitle">圆点颜色代表企划</p>
     <div class="cal-head">
       <button id="calPrev" class="cal-btn" aria-label="上个月">‹</button>
       <span class="cal-title" id="calTitle"></span>
@@ -371,10 +372,12 @@ function renderToday(people, today = nowInKST()) {
     return `<li class="person">
       ${avatarHtml(p, false)}
       <div class="info">
-        <div class="name">${escapeHtml(p.name)}</div>
+        <div class="name-row">
+          <span class="name">${escapeHtml(p.name)}</span>
+          <span class="badge">生日快乐 🎉</span>
+        </div>
         ${meta ? `<div class="meta">${meta}</div>` : ""}
       </div>
-      <span class="badge">生日快乐 🎉</span>
     </li>`;
   }).join("");
 }
