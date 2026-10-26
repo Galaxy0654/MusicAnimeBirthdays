@@ -135,6 +135,7 @@ const DEPT_COLORS = {
   "轻音少女": "#069E1B",
   "Girls Band Cry": "#6B0000",
   "Project Sekai": "#0696DE",
+  "VOCALOID": "#0806D1",
 
   "声优": "#D6B82E",
 };
@@ -255,20 +256,44 @@ function personMeta(p, agePrefix) {
 
 // 头像
 // 头像约定：./avatars/{id}.webp / .jpg / .png，找不到就用姓名
-const AVATAR_CONFIG = {
-  dir: "./avatars/",
-  exts: ["webp", "jpg", "png"],
-  keys: ["name", "subDept", "dept"], // 按顺序尝试，数据库里有什么就用什么
+
+// IP → 目录名。中文目录也能用，但英文/拼音更稳
+const DEPT_DIR = {
+  "BanGDream!": "bang",
+  "LoveLive!": "LL",
+  "少女歌剧": "revue",
+  "轻音少女": "K-ON",
+  "Girls Band Cry": "GBC",
+  "Project Sekai": "PJSK",
 };
+const AVATAR_CFG = {
+  root: "./avatars",
+  exts: ["webp", "jpg", "png"],
+  nameKeys: ["name", "subDept", "dept"], // 按顺序尝试，数据库里有什么就用什么
+  fallbackToRoot: true,
+};
+function deptDirOf(p) {
+  if (!p.dept) return "";
+  return DEPT_DIR[p.dept] || p.dept; // 映射表没有就直接用部门名
+}
 
 function avatarCandidates(p) {
-  if (p.avatar) return [p.avatar];          // 显式指定优先
+  if (p.avatar) return [p.avatar];
+
+  const dir = deptDirOf(p);
+  const names = AVATAR_CFG.nameKeys.map(k => p[k]).filter(Boolean);
+  if (!names.length) return [];
+
+  const dirs = dir ? [dir] : [];
+  if (AVATAR_CFG.fallbackToRoot) dirs.push("");
+
   const urls = [];
-  for (const key of AVATAR_CONFIG.keys) {
-    const v = p[key];
-    if (!v) continue;
-    for (const ext of AVATAR_CONFIG.exts) {
-      urls.push(`${AVATAR_CONFIG.dir}${encodeURIComponent(v)}.${ext}`);
+  for (const d of dirs) {
+    for (const n of names) {
+      for (const ext of AVATAR_CFG.exts) {
+        const seg = d ? `${encodeURIComponent(d)}/` : "";
+        urls.push(`${AVATAR_CFG.root}/${seg}${encodeURIComponent(n)}.${ext}`);
+      }
     }
   }
   return urls;
