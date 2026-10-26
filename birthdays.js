@@ -153,7 +153,7 @@ window.BIRTHDAYS = [
   { name: "Pile", birthday: "1988-05-02", dept: "声优", subDept: "西木野真姬役" },
   { name: "楠田亚衣奈", birthday: "1989-02-01", dept: "声优", subDept: "东条希役" },
   { name: "久保百合花", birthday: "1989-05-19", dept: "声优", subDept: "小泉花阳役" },
-  { name: "徳井青空", birthday: "1984-12-26", dept: "声优", subDept: "矢泽妮可役" },
+  { name: "德井青空", birthday: "1984-12-26", dept: "声优", subDept: "矢泽妮可役" },
   { name: "饭田里穂", birthday: "1991-10-26", dept: "声优", subDept: "星空凛役" },
 
   { name: "黑泽黛雅", birthday: "01-01", dept: "LoveLive!", subDept: "Aqours" },
