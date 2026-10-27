@@ -3,31 +3,35 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>生日提醒（东京时间）</title>
+<link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon/apple-touch-icon.png">
+<link rel="manifest" href="icon/site.webmanifest">
+<title>音企角色、声优生日表</title>
 <style>
   :root { --bg:#f5f7fb; --card:#fff; --pri:#ff6b81; --text:#2b2d42; --sub:#8d99ae; --line:#eef1f6; }
   * { box-sizing: border-box; }
   body {
     margin:0; min-height:100vh; background:var(--bg); padding:32px 16px;
-    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    font-family: system-ui, -apple-system, "PingFang SC", "Source Han Sans", "Microsoft YaHei", sans-serif;
     color: var(--text);
   }
   .wrap { width:100%; max-width:720px; margin:0 auto; display:flex; flex-direction:column; gap:20px; }
   .card { background:var(--card); border-radius:16px; box-shadow:0 10px 30px rgba(43,45,66,.08); padding:24px; }
-  h1 { font-size:19px; margin:0 0 4px; }
-  .subtitle { color:var(--sub); font-size:13px; margin:0 0 16px; }
+  h1 { font-size:20px; margin:0 0 4px; }
+  .subtitle { color:var(--sub); font-size:16px; margin:0 0 16px; }
   ul { list-style:none; margin:0; padding:0; }
 
   li.person { display:flex; align-items:center; gap:14px; padding:12px 0; border-bottom:1px solid var(--line); }
   li.person:last-child { border-bottom:none; }
-  .avatar { width:80px; height:80px; font-size:28px; border-radius:10%; object-fit:cover; background:var(--pri);
+  .avatar { width:90px; height:90px; font-size:28px; border-radius:10%; object-fit:cover; background:var(--pri);
             color:#fff; display:flex; align-items:center; justify-content:center;
             font-weight:600; flex:0 0 auto; }
-  .avatar.sm { width:72px; height:72px; font-size:24px; }
+  .avatar.sm { width:90px; height:90px; font-size:24px; }
   .info { flex:1; min-width:0; }
   .name { font-weight:600; font-size:24px; }
-  .meta { color:var(--sub); font-size:18px; margin-top:2px;
-          display:flex; flex-wrap:wrap; align-items:center; gap:4px 8px; }
+  .meta { color:var(--sub);font-weight:500;font-family: "Source Han Sans";  font-size:18px; margin-top:1px;
+          display:flex; flex-direction: column; align-items:flex-start; gap: 0px; }
   .name-row { display:flex; align-items:center; gap:8px; flex-wrap:wrap; }
   .badge { background:#fff0f3; color:var(--pri); font-size:15px; padding:4px 10px;
            border-radius:999px; white-space:nowrap; }
@@ -41,7 +45,7 @@
   .day-offset { margin-left:auto; background:#fff0f3; color:var(--pri);
                 font-size:15px; padding:3px 9px; border-radius:999px; white-space:nowrap; }
   .person-line { display:flex; align-items:center; gap:10px; padding:5px 0; }
-  .person-line .name { font-size:20px; font-weight:500; }
+  .person-line .name { font-size:24px; font-weight:600; }
 
   .cal-head { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
   .cal-title { font-weight:600; font-size:16px; min-width:104px; text-align:center; }
@@ -72,13 +76,12 @@
 
   .cal-detail { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
   .cal-detail .hint { color:var(--sub); font-size:13px; }
-  .cal-detail-title { font-size:14px; font-weight:600; margin-bottom:6px; }
+  .cal-detail-title { font-size:18px; font-weight:600; margin-bottom:6px; }
   .cal-person { display:flex; align-items:center; gap:10px; padding:6px 0; }
 
   /* 部门 / 子部门 标签 */
-  .dept-tag { display:inline-flex; align-items:center; gap:5px; color:var(--sub); }
+  .dept-tag { display:inline-flex; align-items:center; gap:1px; color:var(--sub); }
   .age-tag { color: var(--sub); }
-  .dept-dot { width:9px; height:9px; border-radius:50%; flex:0 0 auto; }
   .dept-sep { color:#c3c9d4; }
 
   @media (max-width:520px) {
@@ -90,6 +93,9 @@
 </head>
 <body>
 <div class="wrap">
+  <p style="margin:0 0 4px;text-align:right;">
+  <a href="./all_birthdays.html" style="color:#ff6b81;text-decoration:none;font-size:18px;">查看全年生日一览 →</a>
+</p>
 
   <div class="card">
     <h1>🎂 今天的寿星</h1>
@@ -99,7 +105,7 @@
 
   <div class="card">
     <h1>⏱️ 未来 15 天生日</h1>
-    <p class="subtitle" id="upcomingLabel">明天起 · 东京时间</p>
+    <p class="subtitle" id="upcomingLabel">明天起</p>
     <ul id="upcomingList"></ul>
   </div>
 
@@ -123,28 +129,18 @@
 <script>
   const BIRTHDAYS = window.BIRTHDAYS || [];
 
+  const CFG = window.BIRTHDAY_CONFIG;
+  const DEPT_COLORS = CFG.DEPT_COLORS;
+  const DEFAULT_DEPT_COLOR = CFG.DEFAULT_DEPT_COLOR;
+  const DEPT_DIR = CFG.DEPT_DIR;
+  const AVATAR_CFG = CFG.AVATAR_CFG;
+
 // ============ 2. 部门颜色 ============
-// 是否让“子部门”独立上色；false = 同主部门同色，子部门只做文字展示
-const COLOR_BY_SUBDEPT = false;
 
-// 常用固定颜色（COLOR_BY_SUBDEPT=true 时可用 "A/BA" 这样的键）
-const DEPT_COLORS = {
-  "BanGDream!": "#e5004f",
-  "LoveLive!": "#FF7F27",
-  "少女歌剧": "#6FC960",
-  "轻音少女": "#069E1B",
-  "Girls Band Cry": "#6B0000",
-  "Project Sekai": "#0696DE",
-  "VOCALOID": "#0806D1",
-
-  "声优": "#D6B82E",
-};
-const DEFAULT_DEPT_COLOR = "#b2bec3";
 
 // 取一个人用于上色的键
 function colorKeyOf(p) {
   if (!p || !p.dept) return "";
-  if (COLOR_BY_SUBDEPT && p.subDept) return `${p.dept}/${p.subDept}`;
   return p.dept;
 }
 
@@ -238,12 +234,11 @@ function avatarHtml(p, small) {
     : `<div class="${cls}" style="background:${deptColor(colorKeyOf(p))}">${escapeHtml(p.name.slice(0, 1))}</div>`;
 }
 
-// 部门标签：主部门 / 子部门（带颜色点）
+// 部门标签：主部门 / 子部门
 function deptTag(p) {
   const label = deptLabel(p);
   if (!label) return "";
   return `<span class="dept-tag">
-    <span class="dept-dot" style="background:${deptColor(colorKeyOf(p))}"></span>
     ${escapeHtml(p.dept)}${p.subDept ? `<span class="dept-sep">/</span>${escapeHtml(p.subDept)}` : ""}
   </span>`;
 }
@@ -254,26 +249,6 @@ function personMeta(p, agePrefix) {
     : "";
 }
 
-// 头像
-// 头像约定：./avatars/{id}.webp / .jpg / .png，找不到就用姓名
-
-// IP → 目录名。中文目录也能用，但英文/拼音更稳
-const DEPT_DIR = {
-  "BanGDream!": "bang",
-  "LoveLive!": "LL",
-  "少女歌剧": "revue",
-  "轻音少女": "K-ON",
-  "Girls Band Cry": "GBC",
-  "Project Sekai": "PJSK",
-
-  "声优": "CV",
-};
-const AVATAR_CFG = {
-  root: "./avatars",
-  exts: ["webp", "jpg", "png"],
-  nameKeys: ["name", "subDept", "dept"], // 按顺序尝试，数据库里有什么就用什么
-  fallbackToRoot: true,
-};
 function deptDirOf(p) {
   if (!p.dept) return "";
   return DEPT_DIR[p.dept] || p.dept; // 映射表没有就直接用部门名
@@ -379,7 +354,7 @@ function hydrateAvatars(root = document) {
 
 // 拼接 meta：部门标签 + 年龄
 function metaLine(p, agePrefix) {
-  return [deptTag(p), personMeta(p, agePrefix)].filter(Boolean).join(`<span class="dept-sep"> · </span>`);
+  return [deptTag(p), personMeta(p, agePrefix)].filter(Boolean).join("");
 }
 
 // ============ 7. 今日寿星 ============
@@ -420,7 +395,7 @@ function offsetText(i) {
 function renderUpcoming(groups) {
   const total = groups.reduce((n, g) => n + g.people.length, 0);
   document.getElementById("upcomingLabel").textContent =
-    `明天起 · 东京时间 · 共 ${total} 位寿星`;
+    `明天起，共 ${total} 位寿星`;
 
   const ul = document.getElementById("upcomingList");
   if (!groups.length) {
@@ -544,7 +519,6 @@ function renderCalDetail() {
   const isCurrentMonth = calYear === t.getUTCFullYear() && calMonth === t.getUTCMonth() + 1;
 
   let day = selectedDay;
-  let prefix = "";
 
   if (day == null) {
     if (!isCurrentMonth) {
@@ -552,7 +526,6 @@ function renderCalDetail() {
       return;
     }
     day = t.getUTCDate();
-    prefix = "今天 · ";
   }
 
   const d = new Date(Date.UTC(calYear, calMonth - 1, day));
@@ -564,7 +537,7 @@ function renderCalDetail() {
   }
 
   el.innerHTML =
-    `<div class="cal-detail-title">${prefix}${calMonth}月${day}日 · 共 ${people.length} 位</div>` +
+    `<div class="cal-detail-title">${calMonth}月${day}日  共 ${people.length} 位</div>` +
     people.map(p => {
       const meta = metaLine(p, "满 ");
       return `<div class="cal-person">

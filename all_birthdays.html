@@ -1,0 +1,294 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon/apple-touch-icon.png">
+<link rel="manifest" href="icon/site.webmanifest">
+<title>全年生日一览</title>
+<style>
+  :root { --bg:#f5f7fb; --card:#fff; --pri:#ff6b81; --text:#2b2d42; --sub:#8d99ae; --line:#eef1f6; }
+  * { box-sizing: border-box; }
+  body {
+    margin:0; min-height:100vh; background:var(--bg); padding:24px 16px 48px;
+    font-family: system-ui, -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif;
+    color: var(--text);
+  }
+  .page { width:100%; max-width:720px; margin:0 auto; }
+
+  .top { display:flex; align-items:center; justify-content:space-between; gap:12px; margin-bottom:14px; }
+  h1 { font-size:20px; margin:0; }
+  .back { color:var(--pri); text-decoration:none; font-size:18px; white-space:nowrap; }
+  .back:hover { text-decoration:underline; }
+  .subtitle { color:var(--sub); font-size:13px; margin:0 0 16px; }
+
+  .month-nav {
+    display:flex; flex-wrap:wrap; gap:6px;
+    position:sticky; top:0; z-index:10;
+    background:var(--bg); padding:10px 0 12px;
+  }
+  .month-nav a {
+    font-size:13px; color:var(--text); text-decoration:none;
+    background:#fff; border-radius:999px; padding:5px 12px;
+    box-shadow:0 2px 8px rgba(43,45,66,.06);
+  }
+  .month-nav a:hover { background:#fff0f3; color:var(--pri); }
+
+  .month-card {
+    background:var(--card); border-radius:16px; padding:20px 22px;
+    box-shadow:0 10px 30px rgba(43,45,66,.08); margin-bottom:16px;
+    scroll-margin-top:64px;
+  }
+  .month-title { display:flex; align-items:baseline; justify-content:space-between;
+                 font-size:20px; font-weight:600; margin:0 0 10px; }
+  .month-count { font-size:13px; color:var(--sub); font-weight:400; }
+
+  .day-row { display:flex; gap:12px; padding:10px 0; border-bottom:1px solid var(--line); }
+  .day-row:last-child { border-bottom:none; }
+  .day-date { flex:0 0 78px; font-weight:600; font-size:16px; color:var(--text); padding-top:4px; }
+  .day-date.today { color:var(--pri); }
+  .today-tag { display:inline-block; font-size:11px; font-weight:500; color:var(--pri);
+               background:#fff0f3; border-radius:999px; padding:1px 7px; margin-left:4px; }
+
+  /* 同一天多人的纵向排布 */
+  .day-people { flex:1; display:flex; flex-direction:column; gap:10px 18px; min-width:0; }
+  .person { display:inline-flex; align-items:center; gap:7px; font-size:14px; line-height:1.4; }
+  .person-info { display: flex; flex-direction:column; }
+  .person-name { font-weight:600; font-size:20px; }
+  .person .dept { font-size:16px; color:var(--sub); }
+
+  /* 头像 */
+  .avatar {
+    width:60px; height:60px; border-radius:10%; object-fit:cover; flex:0 0 auto;
+    display:inline-flex; align-items:center; justify-content:center;
+    color:#fff; font-size:12px; font-weight:600; background:var(--pri);
+  }
+
+  .empty-month { color:var(--sub); font-size:13px; padding:6px 0 2px; }
+</style>
+</head>
+<body>
+<div class="page">
+
+  <div class="top">
+    <h1>📆 全年生日一览</h1>
+    <a class="back" href="./index.html">← 查看最近生日</a>
+  </div>
+  <p class="subtitle">按日期排列</p>
+
+  <nav class="month-nav" id="monthNav"></nav>
+  <div id="months"></div>
+
+</div>
+
+<!-- 数据源 -->
+<script src="./birthdays.js"></script>
+<script>
+// ============================================================
+// 一、头像配置（与主页面保持一致）
+// ============================================================
+const CFG = window.BIRTHDAY_CONFIG;
+
+const DEPT_COLORS = CFG.DEPT_COLORS;
+const DEFAULT_DEPT_COLOR = CFG.DEFAULT_DEPT_COLOR;
+const DEPT_DIR = CFG.DEPT_DIR;
+const AVATAR_CFG = CFG.AVATAR_CFG;
+
+function colorKeyOf(p) {
+  if (!p || !p.dept) return "";
+  return p.dept;
+}
+
+function deptColor(key) {
+  if (!key) return DEFAULT_DEPT_COLOR;
+  if (DEPT_COLORS[key]) return DEPT_COLORS[key];
+  let h = 0;
+  for (let i = 0; i < key.length; i++) h = (h * 31 + key.charCodeAt(i)) % 360;
+  return `hsl(${h}, 70%, 58%)`;
+}
+
+function deptDirOf(p) {
+  if (!p.dept) return "";
+  return DEPT_DIR[p.dept] || p.dept;
+}
+
+// 生成候选头像路径：部门目录 → 工号/姓名 → webp/jpg/png → 根目录兜底
+function avatarCandidates(p) {
+  if (p.avatar) return [p.avatar];
+
+  const dir = deptDirOf(p);
+  const names = AVATAR_CFG.nameKeys.map(k => p[k]).filter(Boolean);
+  if (!names.length) return [];
+
+  const dirs = dir ? [dir] : [];
+  if (AVATAR_CFG.fallbackToRoot) dirs.push("");
+
+  const urls = [];
+  for (const d of dirs) {
+    for (const n of names) {
+      for (const ext of AVATAR_CFG.exts) {
+        const seg = d ? `${encodeURIComponent(d)}/` : "";
+        urls.push(`${AVATAR_CFG.root}/${seg}${encodeURIComponent(n)}.${ext}`);
+      }
+    }
+  }
+  return urls;
+}
+
+const avatarCandidatesMap = new Map();
+let avatarSeq = 0;
+
+const escapeHtml = s => String(s).replace(/[&<>"']/g, c =>
+  ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+
+function avatarHtml(p) {
+  const bg = deptColor(colorKeyOf(p));
+  const initial = escapeHtml((p.name || "?").trim().slice(0, 1) || "?");
+  const cands = avatarCandidates(p);
+
+  if (!cands.length) {
+    return `<span class="avatar" style="background:${bg}">${initial}</span>`;
+  }
+
+  const key = `av${++avatarSeq}`;
+  avatarCandidatesMap.set(key, cands);
+  return `<img class="avatar" src="${escapeHtml(cands[0])}" alt=""
+    style="background:${escapeHtml(bg)}"
+    data-av-key="${key}" data-idx="0"
+    data-bg="${escapeHtml(bg)}" data-initial="${initial}"
+    loading="lazy" decoding="async" referrerpolicy="no-referrer">`;
+}
+
+// 候选路径全部失败后，替换成首字占位
+function bindAvatarFallback(root = document) {
+  root.querySelectorAll("img.avatar[data-av-key]").forEach(img => {
+    if (img.dataset.bound) return;
+    img.dataset.bound = "1";
+
+    img.addEventListener("error", () => {
+      const cands = avatarCandidatesMap.get(img.dataset.avKey) || [];
+      const next = Number(img.dataset.idx) + 1;
+
+      if (next < cands.length) {
+        img.dataset.idx = next;
+        img.src = cands[next];
+        return;
+      }
+
+      const span = document.createElement("span");
+      span.className = "avatar";
+      span.style.background = img.dataset.bg || "";
+      span.textContent = img.dataset.initial || "?";
+      img.replaceWith(span);
+    });
+  });
+}
+
+// ============================================================
+// 二、解析生日为 { m, d }
+// ============================================================
+function parseMD(raw) {
+  const m = String(raw).match(/(?:(\d{4})[-/.])?(\d{1,2})[-/.](\d{1,2})/);
+  if (!m) return null;
+  return { m: Number(m[2]), d: Number(m[3]) };
+}
+
+// 今天（东九区）的月、日，仅用于高亮
+const KST_OFFSET_MS = 9 * 60 * 60 * 1000;
+const kstNow = new Date(Date.now() + KST_OFFSET_MS);
+const todayM = kstNow.getUTCMonth() + 1;
+const todayD = kstNow.getUTCDate();
+
+// ============================================================
+// 三、按“月 → 日”分组
+// ============================================================
+const monthMap = new Map();
+BIRTHDAYS.forEach(p => {
+  const md = parseMD(p.birthday);
+  if (!md) return;
+  if (!monthMap.has(md.m)) monthMap.set(md.m, new Map());
+  const dayMap = monthMap.get(md.m);
+  if (!dayMap.has(md.d)) dayMap.set(md.d, []);
+  dayMap.get(md.d).push(p);
+});
+monthMap.forEach(dayMap => {
+  dayMap.forEach(list => list.sort((a, b) => a.name.localeCompare(b.name, "zh-Hans-CN")));
+});
+
+// ============================================================
+// 四、渲染
+// ============================================================
+function deptLabel(p) {
+  if (!p.dept) return "";
+  return p.subDept ? `${p.dept} / ${p.subDept}` : p.dept;
+}
+
+function daysOf(month) {
+  const dayMap = monthMap.get(month);
+  if (!dayMap) return [];
+  return [...dayMap.keys()].sort((a, b) => a - b);
+}
+
+function renderMonthNav() {
+  const nav = document.getElementById("monthNav");
+  const months = [...monthMap.keys()].sort((a, b) => a - b);
+  nav.innerHTML = months.map(m => `<a href="#m-${m}">${m}月</a>`).join("");
+}
+
+function renderMonths() {
+  const box = document.getElementById("months");
+  const months = [...monthMap.keys()].sort((a, b) => a - b);
+
+  if (!months.length) {
+    box.innerHTML = `<div class="month-card"><p class="empty-month">暂无生日数据</p></div>`;
+    return;
+  }
+
+  box.innerHTML = months.map(m => {
+    const days = daysOf(m);
+    const count = days.reduce((n, d) => n + monthMap.get(m).get(d).length, 0);
+
+    const rows = days.map(d => {
+      const people = monthMap.get(m).get(d);
+      const isToday = m === todayM && d === todayD;
+
+      const peopleHtml = people.map(p => {
+        const dept = deptLabel(p);
+        return `<span class="person">
+          ${avatarHtml(p)}
+          <span class="person-info">
+            <span class="person-name">${escapeHtml(p.name)}</span>
+            ${dept ? `<span class="dept">${escapeHtml(dept)}</span>` : ""}
+          </span>
+        </span>`;
+      }).join("");
+
+      return `<div class="day-row">
+        <div class="day-date${isToday ? " today" : ""}">
+          ${m}月${d}日${isToday ? `<span class="today-tag">今天</span>` : ""}
+        </div>
+        <div class="day-people">${peopleHtml}</div>
+      </div>`;
+    }).join("");
+
+    return `<section class="month-card" id="m-${m}">
+      <h2 class="month-title">
+        <span>${m}月</span>
+        <span class="month-count">${count} 位</span>
+      </h2>
+      ${rows}
+    </section>`;
+  }).join("");
+}
+
+// ============================================================
+// 五、启动
+// ============================================================
+renderMonthNav();
+renderMonths();
+bindAvatarFallback();
+</script>
+</body>
+</html>

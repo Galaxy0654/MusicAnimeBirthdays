@@ -1,3 +1,41 @@
+window.BIRTHDAY_CONFIG = {
+
+  // IP → 颜色
+  DEPT_COLORS: {
+    "BanGDream!": "#e5004f",
+    "LoveLive!": "#FF7F27",
+    "少女歌剧": "#6FC960",
+    "轻音少女": "#069E1B",
+    "Girls Band Cry": "#6B0000",
+    "Project Sekai": "#0696DE",
+    "VOCALOID": "#0806D1",
+
+    "声优": "#D6B82E",
+  },
+  // 缺省
+  DEFAULT_DEPT_COLOR: "#b2bec3",
+
+  // IP → avatars 下的目录名
+  DEPT_DIR: {
+    "BanGDream!": "bang",
+    "LoveLive!": "LL",
+    "少女歌剧": "revue",
+    "轻音少女": "K-ON",
+    "Girls Band Cry": "GBC",
+    "Project Sekai": "PJSK",
+
+    "声优": "CV",
+  },
+
+  // 头像路径规则
+  AVATAR_CFG: {
+    root: "./avatars",
+    exts: ["webp", "jpg", "png"],        // 按顺序尝试
+    nameKeys: ["name", "subDept", "dept"], // 文件名优先用工号，其次姓名
+    fallbackToRoot: true,                // 部门目录找不到时回退到 avatars 根目录
+  },
+};
+
 window.BIRTHDAYS = [
 //BanGDream!角色
   { name: "牛込里美", birthday: "03-23", dept: "BanGDream!", subDept: "Poppin'Party" },
@@ -304,11 +342,11 @@ window.BIRTHDAYS = [
   { name: "佐藤日向", birthday: "1998-12-23", dept: "声优", subDept: "星见纯那、晓山瑞希役" },
 
 //轻音少女
-  { name: "秋山澪", birthday: "01-15", dept: "轻音少女" },
-  { name: "琴吹䌷", birthday: "07-02", dept: "轻音少女" },
-  { name: "田井中律", birthday: "08-21", dept: "轻音少女" },
-  { name: "中野梓", birthday: "11-11", dept: "轻音少女" },
-  { name: "平泽唯", birthday: "11-27", dept: "轻音少女" },
+  { name: "秋山澪", birthday: "01-15", dept: "轻音少女", subDept: "放課後ティータイム" },
+  { name: "琴吹䌷", birthday: "07-02", dept: "轻音少女", subDept: "放課後ティータイム" },
+  { name: "田井中律", birthday: "08-21", dept: "轻音少女", subDept: "放課後ティータイム" },
+  { name: "中野梓", birthday: "11-11", dept: "轻音少女", subDept: "放課後ティータイム" },
+  { name: "平泽唯", birthday: "11-27", dept: "轻音少女", subDept: "放課後ティータイム" },
 
   { name: "日笠阳子", birthday: "1985-07-16", dept: "声优", subDept: "秋山澪、宇田川巴役" },
   { name: "佐藤聪美", birthday: "1986-05-08", dept: "声优", subDept: "田井中律役" },
