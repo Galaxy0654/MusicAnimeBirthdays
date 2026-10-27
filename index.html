@@ -485,6 +485,7 @@ function renderCalendar() {
   const todayDay = t.getUTCDate();
 
   const cells = [];
+  const MAX_DOTS = 9;
   WEEK_CN.split("").forEach(w => cells.push(`<div class="cal-weekday">${w}</div>`));
   for (let i = 0; i < firstDow; i++) cells.push(`<div class="cal-cell empty"></div>`);
 
@@ -497,11 +498,11 @@ function renderCalendar() {
 
     const dots = people.length
       ? `<div class="cal-dots">` +
-        people.slice(0, 5).map(p => {
+        people.slice(0, MAX_DOTS).map(p => {
           const label = [p.name, deptLabel(p)].filter(Boolean).join(" · ");
           return `<span class="dot" style="background:${deptColor(colorKeyOf(p))}" title="${escapeHtml(label)}"></span>`;
         }).join("") +
-        (people.length > 5 ? `<span class="cal-more">+${people.length - 5}</span>` : "") +
+        (people.length > MAX_DOTS ? `<span class="cal-more">+${people.length - MAX_DOTS}</span>` : "") +
         `</div>`
       : "";
     const dataDay = people.length ? ` data-day="${day}"` : "";

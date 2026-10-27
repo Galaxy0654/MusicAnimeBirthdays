@@ -113,6 +113,12 @@ window.BIRTHDAYS = [
   { name: "仲町阿拉蕾", birthday: "08-16", dept: "BanGDream!", subDept: "夢限大みゅーたいぷ" },
   { name: "藤都子", birthday: "09-19", dept: "BanGDream!", subDept: "夢限大みゅーたいぷ" },
   { name: "千石由乃", birthday: "11-04", dept: "BanGDream!", subDept: "夢限大みゅーたいぷ" },
+  
+  { name: "峰月律（皮下）", birthday: "02-07", dept: "声优" },
+  { name: "宫永野乃花（皮下）", birthday: "04-17", dept: "声优" },
+  { name: "仲町阿拉蕾（皮下）", birthday: "08-16", dept: "声优" },
+  { name: "藤都子（皮下）", birthday: "09-19", dept: "声优" },
+  { name: "千石由乃（皮下）", birthday: "11-04", dept: "声优" },
 
   { name: "汐见萤", birthday: "03-12", dept: "BanGDream!", subDept: "millsage" },
   { name: "伊泽枣", birthday: "03-30", dept: "BanGDream!", subDept: "millsage" },
@@ -123,8 +129,8 @@ window.BIRTHDAYS = [
   { name: "结川麻希", birthday: "02-15", dept: "声优", subDept: "琴平凪役" },
   { name: "伊驹百合绘", birthday: "02-24", dept: "声优", subDept: "滨崎茉幌役" },
   { name: "千春", birthday: "1995-04-10", dept: "声优", subDept: "伊泽枣役" },
-  { name: "药师寺李有", birthday: "09-11", dept: "声优", subDept: "汐见萤役" },
-  { name: "咲川雏乃", birthday: "2001-01-22", dept: "声优", subDept: "和泉朋花役" },
+  { name: "药师寺李有", birthday: "2002-09-11", dept: "声优", subDept: "汐见萤役" },
+  { name: "咲川雏乃", birthday: "2004-01-22", dept: "声优", subDept: "和泉朋花役" },
   
   { name: "四宫宁月", birthday: "03-05", dept: "BanGDream!", subDept: "一家Dumb Rock!" },
   { name: "梅里千樱梨", birthday: "04-02", dept: "BanGDream!", subDept: "一家Dumb Rock!" },
