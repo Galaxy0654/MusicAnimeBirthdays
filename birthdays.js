@@ -152,11 +152,11 @@ window.BIRTHDAYS = [
   { name: "藤都子", birthday: "09-19", dept: "BanGDream!", subDept: "夢限大みゅーたいぷ" },
   { name: "千石由乃", birthday: "11-04", dept: "BanGDream!", subDept: "夢限大みゅーたいぷ" },
   
-  { name: "峰月律（皮下）", birthday: "02-07", dept: "声优" },
-  { name: "宫永野乃花（皮下）", birthday: "04-17", dept: "声优" },
-  { name: "仲町阿拉蕾（皮下）", birthday: "08-16", dept: "声优" },
-  { name: "藤都子（皮下）", birthday: "09-19", dept: "声优" },
-  { name: "千石由乃（皮下）", birthday: "11-04", dept: "声优" },
+  { name: "峰月律(皮下)", birthday: "02-07", dept: "声优" },
+  { name: "宫永野乃花(皮下)", birthday: "04-17", dept: "声优" },
+  { name: "仲町阿拉蕾(皮下)", birthday: "08-16", dept: "声优" },
+  { name: "藤都子(皮下)", birthday: "09-19", dept: "声优" },
+  { name: "千石由乃(皮下)", birthday: "11-04", dept: "声优" },
 
   { name: "汐见萤", birthday: "03-12", dept: "BanGDream!", subDept: "millsage" },
   { name: "伊泽枣", birthday: "03-30", dept: "BanGDream!", subDept: "millsage" },
@@ -243,7 +243,7 @@ window.BIRTHDAYS = [
   { name: "法元明菜", birthday: "1996-08-05", dept: "声优", subDept: "钟岚珠役" },
   { name: "大西亚玖璃", birthday: "1997-05-02", dept: "声优", subDept: "上原步梦役" },
   { name: "指出毬亚", birthday: "1998-09-20", dept: "声优", subDept: "艾玛·维尔德役" },
-  { name: "楠木灯", birthday: "1999-12-22", dept: "声优", subDept: "（原）优木雪菜、宵崎奏役" },
+  { name: "楠木灯", birthday: "1999-12-22", dept: "声优", subDept: "优木雪菜(原)、宵崎奏役" },
 
   { name: "薇恩·玛格丽特", birthday: "01-20", dept: "LoveLive!", subDept: "Liella!" },
   { name: "岚千砂都", birthday: "02-25", dept: "LoveLive!", subDept: "Liella!" },

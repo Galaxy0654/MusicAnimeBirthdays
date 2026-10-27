@@ -71,8 +71,8 @@
 
   .cal-legend { display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:14px;
                 padding-top:12px; border-top:1px solid var(--line); }
-  .legend-item { display:flex; align-items:center; gap:6px; font-size:12px; color:var(--sub); }
-  .legend-dot { width:8px; height:8px; border-radius:50%; flex:0 0 auto; }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:15px; color:var(--sub); }
+  .legend-dot { width:10px; height:10px; border-radius:50%; flex:0 0 auto; }
 
   .cal-detail { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
   .cal-detail .hint { color:var(--sub); font-size:13px; }
@@ -81,6 +81,8 @@
 
   /* 部门 / 子部门 标签 */
   .dept-tag { display:inline-flex; align-items:center; gap:1px; color:var(--sub); }
+  .dept-main { color:var(--text); font-weight:600; }
+  .dept-sub { color:var(--sub); }
   .age-tag { color: var(--sub); }
   .dept-sep { color:#c3c9d4; }
 
@@ -234,12 +236,15 @@ function avatarHtml(p, small) {
     : `<div class="${cls}" style="background:${deptColor(colorKeyOf(p))}">${escapeHtml(p.name.slice(0, 1))}</div>`;
 }
 
-// 部门标签：主部门 / 子部门
+// 部门标签
 function deptTag(p) {
-  const label = deptLabel(p);
-  if (!label) return "";
+  if (!p.dept) return "";
+  const main = `<span class="dept-main">${escapeHtml(p.dept)}</span>`;
+  const sub = p.subDept
+    ? `<span class="dept-sep">/ </span><span class="dept-sub">${escapeHtml(p.subDept)}</span>`
+    : "";
   return `<span class="dept-tag">
-    ${escapeHtml(p.dept)}${p.subDept ? `<span class="dept-sep">/</span>${escapeHtml(p.subDept)}` : ""}
+    <span class="dept-text">${main}${sub}</span>
   </span>`;
 }
 
