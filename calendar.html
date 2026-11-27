@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link rel="icon" type="image/png" sizes="32x32" href="icon/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="icon/favicon-16x16.png">
+<link rel="apple-touch-icon" sizes="180x180" href="icon/apple-touch-icon.png">
+<link rel="manifest" href="icon/site.webmanifest">
+<link rel="stylesheet" href="./typography.css">
+<link rel="stylesheet" href="./site-ui.css">
+<title>生日日历</title>
+<style>
+  body { padding:32px 16px; }
+  .page-heading h1 { margin:0 0 4px; }
+
+  .cal-head { display:flex; align-items:center; gap:8px; margin-bottom:14px; }
+  .cal-title { font-weight:600; font-size:var(--fs-meta); min-width:112px; text-align:center; }
+  .cal-btn { border:none; background:#f0f2f8; color:var(--text); border-radius:6px;
+             width:34px; height:34px; font-size:18px; line-height:1; cursor:pointer; }
+  .cal-btn:hover { background:#e4e8f2; }
+  .cal-btn-text { width:auto; padding:0 12px; font-size:16px; height:34px; margin-left:auto; }
+  .cal-grid { display:grid; grid-template-columns:repeat(7,1fr); gap:6px; }
+  .cal-weekday { text-align:center; font-size:var(--fs-caption); color:var(--sub); padding:2px 0 4px; }
+  .cal-cell { min-height:58px; border-radius:6px; background:#fafbfe;
+              display:flex; flex-direction:column; align-items:center; justify-content:flex-start;
+              gap:5px; padding:7px 4px; font-size:16px; }
+  .cal-cell.empty { background:transparent; }
+  .cal-cell.has-bday { background:#fff3fd; cursor:pointer; }
+  .cal-cell.has-bday:hover { background:#ffe3ea; }
+  .cal-cell.today { box-shadow:inset 0 0 0 2px var(--pri); }
+  .cal-cell.selected { box-shadow:inset 0 0 0 2px var(--text); }
+  .cal-day-num { font-weight:600; }
+  .cal-cell.has-bday .cal-day-num { color:var(--pri); }
+  .cal-dots { display:flex; gap:3px; flex-wrap:wrap; justify-content:center; align-items:center; }
+  .dot { width:6px; height:6px; border-radius:50%; background:var(--pri); }
+  .cal-more { font-size:14px; color:var(--pri); }
+
+  .cal-legend { display:flex; flex-wrap:wrap; gap:8px 14px; margin-top:14px;
+                padding-top:12px; border-top:1px solid var(--line); }
+  .legend-item { display:flex; align-items:center; gap:6px; font-size:16px; color:var(--sub); }
+  .legend-dot { width:10px; height:10px; border-radius:2px; flex:0 0 auto; }
+
+  .cal-detail { margin-top:14px; padding-top:14px; border-top:1px solid var(--line); }
+  .cal-detail .hint { color:var(--sub); font-size:var(--fs-caption); }
+  .cal-detail-title { font-size:19px; font-weight:600; margin-bottom:6px; }
+  .cal-person { display:flex; align-items:center; gap:10px; padding:6px 0; }
+  @media (max-width:520px) {
+    .cal-cell { min-height:54px; padding:6px 2px; font-size:16px; }
+    .cal-title { min-width:96px; font-size:16px; }
+  }
+</style>
+</head>
+<body>
+<div class="page stack">
+  <header class="site-head">
+    <nav class="site-nav" aria-label="页面导航">
+      <a href="./index.html">最近生日</a>
+      <a href="./calendar.html" aria-current="page">生日日历</a>
+      <a href="./all_birthdays.html">全年一览</a>
+    </nav>
+    <div id="birthdayFilters"></div>
+  </header>
+
+  <header class="page-heading">
+    <h1>生日日历</h1>
+  </header>
+
+  <div class="card">
+    <div class="cal-head">
+      <button id="calPrev" class="cal-btn" aria-label="上个月">‹</button>
+      <span class="cal-title" id="calTitle"></span>
+      <button id="calNext" class="cal-btn" aria-label="下个月">›</button>
+      <button id="calToday" class="cal-btn cal-btn-text">回到本月</button>
+    </div>
+    <div class="cal-grid" id="calGrid"></div>
+    <div class="cal-legend" id="calLegend"></div>
+    <div class="cal-detail" id="calDetail"></div>
+  </div>
+</div>
+
+<script src="./birthdays.js"></script>
+<script src="./birthday-core.js"></script>
+<script src="./birthday-filter.js"></script>
+<script>
+const Core = window.BirthdayCore;
+const {
+  WEEK_CN,
+  byName,
+  escapeHTML,
+  findBirthdaysOn,
+} = Core;
+
+let calYear;
+let calMonth;
+let selectedDay = null;
+
+function syncCalToNow() {
+  const today = Core.nowInChina();
+  calYear = today.getUTCFullYear();
+  calMonth = today.getUTCMonth() + 1;
+  selectedDay = null;
+}
+
+function monthBirthdayMap(subjects) {
+  const map = new Map();
+  const daysInMonth = new Date(Date.UTC(calYear, calMonth, 0)).getUTCDate();
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const date = new Date(Date.UTC(calYear, calMonth - 1, day));
+    const people = findBirthdaysOn(subjects, date).sort(byName);
+    if (people.length) map.set(day, people);
+  }
+
+  return map;
+}
+
+function renderCalendar(subjects) {
+  document.getElementById("calTitle").textContent = `${calYear}年${calMonth}月`;
+
+  const firstDayOfWeek = new Date(Date.UTC(calYear, calMonth - 1, 1)).getUTCDay();
+  const daysInMonth = new Date(Date.UTC(calYear, calMonth, 0)).getUTCDate();
+  const birthdaysByDay = monthBirthdayMap(subjects);
+  const today = Core.nowInChina();
+  const isCurrentMonth =
+    calYear === today.getUTCFullYear() && calMonth === today.getUTCMonth() + 1;
+  const todayDay = today.getUTCDate();
+  const cells = [];
+  const maxDots = 9;
+
+  WEEK_CN.split("").forEach(weekday => {
+    cells.push(`<div class="cal-weekday">${weekday}</div>`);
+  });
+  for (let index = 0; index < firstDayOfWeek; index++) {
+    cells.push(`<div class="cal-cell empty"></div>`);
+  }
+
+  for (let day = 1; day <= daysInMonth; day++) {
+    const people = birthdaysByDay.get(day) || [];
+    const classes = ["cal-cell"];
+    if (people.length) classes.push("has-bday");
+    if (isCurrentMonth && day === todayDay) classes.push("today");
+    if (selectedDay === day) classes.push("selected");
+
+    const dots = people.length
+      ? `<div class="cal-dots">${people.slice(0, maxDots).map(person => {
+          const label = [person.name, Core.subjectMetaText(person)]
+            .filter(Boolean)
+            .join(" · ");
+          return `<span class="dot"
+            style="background:${escapeHTML(Core.colorForSubject(person))}"
+            title="${escapeHTML(label)}"></span>`;
+        }).join("")}${
+          people.length > maxDots
+            ? `<span class="cal-more">+${people.length - maxDots}</span>`
+            : ""
+        }</div>`
+      : "";
+    const dataDay = people.length ? ` data-day="${day}"` : "";
+
+    cells.push(`<div class="${classes.join(" ")}"${dataDay}>
+      <span class="cal-day-num">${day}</span>${dots}
+    </div>`);
+  }
+
+  const trailingCells = (7 - (firstDayOfWeek + daysInMonth) % 7) % 7;
+  for (let index = 0; index < trailingCells; index++) {
+    cells.push(`<div class="cal-cell empty"></div>`);
+  }
+
+  document.getElementById("calGrid").innerHTML = cells.join("");
+  renderCalLegend(birthdaysByDay);
+}
+
+function renderCalLegend(birthdaysByDay) {
+  const legend = document.getElementById("calLegend");
+  const entries = new Map();
+
+  birthdaysByDay.forEach(people => people.forEach(person => {
+    const key = Core.colorKeyOf(person);
+    if (key && !entries.has(key)) {
+      entries.set(key, {
+        label: Core.colorLabelOf(person),
+        color: Core.colorForSubject(person),
+      });
+    }
+  }));
+
+  if (!entries.size) {
+    legend.innerHTML = "";
+    return;
+  }
+
+  legend.innerHTML = [...entries.values()]
+    .sort((left, right) => left.label.localeCompare(right.label, "zh-Hans-CN"))
+    .map(entry => `<span class="legend-item">
+      <span class="legend-dot" style="background:${escapeHTML(entry.color)}"></span>
+      ${escapeHTML(entry.label)}
+    </span>`)
+    .join("");
+}
+
+function renderCalDetail(subjects) {
+  const detail = document.getElementById("calDetail");
+  const today = Core.nowInChina();
+  const isCurrentMonth =
+    calYear === today.getUTCFullYear() && calMonth === today.getUTCMonth() + 1;
+  let day = selectedDay;
+
+  if (day == null) {
+    if (!isCurrentMonth) {
+      detail.innerHTML =
+        `<span class="hint">请选择高亮日期</span>`;
+      return;
+    }
+    day = today.getUTCDate();
+  }
+
+  const date = new Date(Date.UTC(calYear, calMonth - 1, day));
+  const people = findBirthdaysOn(subjects, date).sort(byName);
+
+  if (!people.length) {
+    detail.innerHTML =
+      `<span class="hint">${calMonth}月${day}日没有符合条件的寿星</span>`;
+    return;
+  }
+
+  detail.innerHTML =
+    `<div class="cal-detail-title">${calMonth}月${day}日  共 ${people.length} 位</div>` +
+    people.map(person => {
+      const meta = Core.subjectMetaHTML(person, { agePrefix: "满 " });
+      return `<div class="cal-person">
+        ${Core.avatarHTML(person, { small: true })}
+        <div class="info">
+          <div class="name">${escapeHTML(person.name)}</div>
+          ${meta ? `<div class="meta">${meta}</div>` : ""}
+        </div>
+      </div>`;
+    }).join("");
+}
+
+function renderTrackedMonth() {
+  Core.resetAvatars();
+  const subjects = window.BirthdayFilters.getSubjects();
+  renderCalendar(subjects);
+  renderCalDetail(subjects);
+}
+
+function shiftMonth(delta) {
+  let month = calMonth + delta;
+  let year = calYear;
+
+  if (month < 1) {
+    month = 12;
+    year--;
+  }
+  if (month > 12) {
+    month = 1;
+    year++;
+  }
+
+  calYear = year;
+  calMonth = month;
+  selectedDay = null;
+  renderTrackedMonth();
+}
+
+document.getElementById("calPrev").addEventListener("click", () => shiftMonth(-1));
+document.getElementById("calNext").addEventListener("click", () => shiftMonth(1));
+document.getElementById("calToday").addEventListener("click", () => {
+  syncCalToNow();
+  renderTrackedMonth();
+});
+document.getElementById("calGrid").addEventListener("click", event => {
+  const cell = event.target.closest(".has-bday");
+  if (!cell || !cell.dataset.day) return;
+  selectedDay = Number(cell.dataset.day);
+  renderTrackedMonth();
+});
+
+window.BirthdayFilters.subscribe(renderTrackedMonth);
+syncCalToNow();
+renderTrackedMonth();
+Core.scheduleChinaMidnightRefresh(renderTrackedMonth);
+</script>
+</body>
+</html>

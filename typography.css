@@ -1,0 +1,43 @@
+:root {
+  --font-ui:
+    "Source Han Sans SC",
+    "Source Han Sans CN",
+    "Source Han Sans",
+    "Noto Sans CJK SC",
+    "Noto Sans SC",
+    "PingFang SC",
+    "Microsoft YaHei",
+    sans-serif;
+  --fs-body: 17px;
+  --fs-h1: 22px;
+  --fs-name: 24px;
+  --fs-meta: 17px;
+  --fs-caption: 15px;
+  --line-body: 1.55;
+}
+
+html {
+  font-family: var(--font-ui);
+  font-size: var(--fs-body);
+  line-height: var(--line-body);
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  font-family: inherit;
+  font-size: var(--fs-body);
+  line-height: var(--line-body);
+  font-synthesis: none;
+}
+
+h1 {
+  font-family: inherit;
+  font-size: var(--fs-h1);
+  line-height: 1.35;
+  font-weight: 700;
+}
+
+.subtitle {
+  font-size: var(--fs-meta);
+  line-height: 1.5;
+}
