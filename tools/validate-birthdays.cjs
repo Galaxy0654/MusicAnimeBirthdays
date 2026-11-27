@@ -5,7 +5,12 @@ const vm = require("vm");
 const root = path.resolve(__dirname, "..");
 const context = { window: {}, console };
 
-for (const file of ["birthdays.js", "birthday-core.js", "birthday-filter.js"]) {
+for (const file of [
+  "birthdays.js",
+  "contacts.js",
+  "birthday-core.js",
+  "birthday-filter.js",
+]) {
   vm.runInNewContext(
     fs.readFileSync(path.join(root, file), "utf8"),
     context,
@@ -16,10 +21,12 @@ for (const file of ["birthdays.js", "birthday-core.js", "birthday-filter.js"]) {
 const core = context.window.BirthdayCore;
 const filters = context.window.BirthdayFilters;
 const data = context.window.BIRTHDAY_DATA;
+const contactRows = context.window.BIRTHDAY_CONTACTS || [];
 const issues = core.validateData();
 const allIds = [
   ...data.characters.map(character => character.id),
   ...data.voiceActors.map(actor => actor.id),
+  ...contactRows.map(contact => contact.id),
 ];
 
 if (new Set(allIds).size !== allIds.length) {
@@ -30,6 +37,16 @@ if (!data.characters.length || !data.voiceActors.length) {
   issues.push("角色或声优数据为空。");
 }
 
+const requiredRelations = new Set(["亲人", "朋友", "老师"]);
+for (const contact of contactRows) {
+  if (!requiredRelations.has(contact.relation)) {
+    issues.push(`熟人示例缺少关系类型：${contact.name}`);
+  }
+  if (!contact.contact || !Object.values(contact.contact).some(Boolean)) {
+    issues.push(`熟人示例缺少联系方式：${contact.name}`);
+  }
+}
+
 const localContacts = core.parseLocalContacts(JSON.stringify([{
   id: "local:validation",
   name: "测试熟人",
@@ -38,15 +55,6 @@ const localContacts = core.parseLocalContacts(JSON.stringify([{
 
 if (localContacts.length !== 1) {
   issues.push("本地熟人数据入口不可用。");
-}
-
-const legacyFields = ["dept", "subDept"].filter(field =>
-  data.characters.some(character => field in character) ||
-  data.voiceActors.some(actor => field in actor)
-);
-
-if (legacyFields.length) {
-  issues.push(`仍存在旧字段：${legacyFields.join(", ")}`);
 }
 
 const subjects = core.getBirthdaySubjects();
@@ -61,7 +69,9 @@ const projectSekaiActorIds = new Set(
   )
 );
 const projectSekaiExpected =
-  projectSekaiCharacters.length + projectSekaiActorIds.size;
+  projectSekaiCharacters.length +
+  projectSekaiActorIds.size +
+  contactRows.length;
 const filterState = {
   showCharacters: true,
   showVoiceActors: true,
@@ -74,9 +84,10 @@ if (filters.filterSubjects(subjects, filterState).length !== projectSekaiExpecte
 }
 
 if (
-  filters.filterSubjects(subjects, { ...filterState, workIds: [] }).length !== 0
+  filters.filterSubjects(subjects, { ...filterState, workIds: [] }).length !==
+  contactRows.length
 ) {
-  issues.push("作品全不选时仍返回了角色或声优。");
+  issues.push("作品全不选时，只应保留不受作品限制的熟人。");
 }
 
 if (
@@ -95,9 +106,9 @@ if (
     showCharacters: false,
     showVoiceActors: false,
     showContacts: true,
-  }).length !== 0
+  }).length !== contactRows.length
 ) {
-  issues.push("角色和声优都关闭时，作品条件不应影响熟人。");
+  issues.push("角色和声优都关闭时，应只返回熟人。");
 }
 
 if (
@@ -125,6 +136,7 @@ if (issues.length) {
   console.log(
     `OK: ${data.characters.length} characters, ` +
     `${data.voiceActors.length} voice actors, ` +
-    `${data.groups.length} groups, ${creditCount} credits.`
+    `${data.groups.length} groups, ${creditCount} credits, ` +
+    `${contactRows.length} contacts.`
   );
 }

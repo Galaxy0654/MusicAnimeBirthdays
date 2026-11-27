@@ -185,9 +185,15 @@
   const publicVoiceActorSubjects = voiceActors
     .map(voiceActorSubject)
     .filter(Boolean);
+  const bundledContactSubjects = (
+    Array.isArray(global.BIRTHDAY_CONTACTS) ? global.BIRTHDAY_CONTACTS : []
+  )
+    .map(contactSubject)
+    .filter(Boolean);
   const publicSubjects = [
     ...publicCharacterSubjects,
     ...publicVoiceActorSubjects,
+    ...bundledContactSubjects,
   ];
   const publicSubjectIds = new Set(publicSubjects.map(subject => subject.id));
 
@@ -463,6 +469,17 @@
       ids.add(actor.id);
       if (!parseBirthday(actor.birthday)) {
         issues.push(`声优 ${actor.id} 的生日无效。`);
+      }
+    }
+
+    for (const contact of bundledContactSubjects) {
+      if (ids.has(contact.id)) issues.push(`ID 重复：${contact.id}`);
+      ids.add(contact.id);
+      if (!contact.id || !contact.name) {
+        issues.push("熟人记录缺少 id 或 name。");
+      }
+      if (!parseBirthday(contact.birthday)) {
+        issues.push(`熟人 ${contact.id || contact.name} 的生日无效。`);
       }
     }
 
